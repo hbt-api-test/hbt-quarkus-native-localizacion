@@ -10,6 +10,6 @@ import java.util.List;
 public interface IEstructuraService {
 
     List<EstructuraGeografica> findAll();
-    List<EstructuraDTO> findByIdNivel(Long id);
+    List<EstructuraDTO> findByIdNivel(Long id, String codigoIso);
 
 }

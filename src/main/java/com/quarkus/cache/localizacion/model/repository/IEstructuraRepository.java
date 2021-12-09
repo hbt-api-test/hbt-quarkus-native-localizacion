@@ -11,5 +11,5 @@ import java.util.List;
 @Singleton
 public interface IEstructuraRepository extends JpaRepository<EstructuraGeografica, Long> {
 
-    List<EstructuraGeografica> findByNivel_Id(Long id);
+    List<EstructuraGeografica> findByNivel_IdAndCodigoIsoStartingWith(Long id, String codigoIso);
 }

@@ -6,14 +6,18 @@ import com.quarkus.cache.localizacion.model.entity.EstructuraGeografica;
 import com.quarkus.cache.localizacion.model.repository.IEstructuraRepository;
 import com.quarkus.cache.localizacion.model.service.interfaces.IEstructuraService;
 import io.quarkus.cache.CacheResult;
+import lombok.extern.slf4j.Slf4j;
 
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
+@Slf4j
 public class EstructuraService implements IEstructuraService {
 
     @Inject
@@ -26,9 +30,9 @@ public class EstructuraService implements IEstructuraService {
 
     @Override
     @CacheResult(cacheName = "localizacion-cache")
-    public List<EstructuraDTO> findByIdNivel(Long id) {
+    public List<EstructuraDTO> findByIdNivel(Long id, String codigoIso) {
 
-        List<EstructuraGeografica> estructuras = estructuraRepository.findByNivel_Id(id);
+        List<EstructuraGeografica> estructuras = estructuraRepository.findByNivel_IdAndCodigoIsoStartingWith(id,codigoIso);
 
 
         List<EstructuraDTO> dtos =   estructuras.stream()
@@ -37,11 +41,9 @@ public class EstructuraService implements IEstructuraService {
                     estructuraDTO.setId(e.getId());
                     estructuraDTO.setNombre(e.getNombreUbicacion());
 
-                    String prov = e.getUbicacionPadre().getNombreUbicacion();
-                    String dpto = e.getUbicacionPadre().getUbicacionPadre().getNombreUbicacion();
-                    String pais = e.getUbicacionPadre().getUbicacionPadre().getUbicacionPadre().getNombreUbicacion();
+                    estructuraDTO.setUbicacion(padres(e.getUbicacionPadre(),
+                            e.getUbicacionPadre().getNombreUbicacion()));
 
-                    estructuraDTO.setUbicacion(pais + "->" + dpto + "->" + prov);
                     return estructuraDTO;
 
                 }).collect(Collectors.toList());
@@ -50,4 +52,14 @@ public class EstructuraService implements IEstructuraService {
 
         return  dtos;
     }
+
+    private String padres(EstructuraGeografica padre, String ubicacion){
+        if(padre.getUbicacionPadre() != null){
+            ubicacion = padres(padre.getUbicacionPadre(), ubicacion + " -> " + padre.getUbicacionPadre().getNombreUbicacion());
+        }
+        return ubicacion;
+    }
+
+
+
 }

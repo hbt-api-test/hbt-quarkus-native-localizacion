@@ -34,14 +34,14 @@ public class EstructuraResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/{id}/iso/{codigoIso}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseData<List<EstructuraDTO>> findByIdNivel(@PathParam Long id){
+    public ResponseData<List<EstructuraDTO>> findByIdNivel(@PathParam Long id, @PathParam String codigoIso){
         log.info("ID: " + id);
         Long timeSeconds = System.currentTimeMillis() ;
 
         ResponseData<List<EstructuraDTO>> responseData = new ResponseData<>();
-        List<EstructuraDTO> respuesta = estructuraService.findByIdNivel(id);
+        List<EstructuraDTO> respuesta = estructuraService.findByIdNivel(id, codigoIso);
         responseData.setCount(respuesta.size());
         responseData.setMessage("Datos obtenidos");
         responseData.setStatus(HttpStatus.OK);
